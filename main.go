@@ -10,11 +10,17 @@ import (
 )
 
 func main() {
-	dimensionStr := flag.String("d", "", "Dimension in feet and inches, e.g., 8'6\"")
+	dimensionStr := flag.String("d", "", "Dimension in feet and inches, e.g., 8ft6in or 8f6i or 8'6\"")
+	numSections := flag.Int("s", 1, "Number of sections to divide the dimension into (default is 1 section)")
 	flag.Parse()
 
 	if *dimensionStr == "" {
-		fmt.Println("Please provide a dimension using the -d flag, e.g., -d 8'6\"")
+		fmt.Println("Please provide a dimension using the -d flag, e.g., -d 8ft6in")
+		return
+	}
+
+	if *numSections <= 0 {
+		fmt.Println("Number of sections must be a positive integer.")
 		return
 	}
 
@@ -24,27 +30,37 @@ func main() {
 		return
 	}
 
-	sectionsNeeded := int(math.Ceil(totalFeet / 3))
-
-	fmt.Println(sectionsNeeded)
+	sectionSizeFeet := totalFeet / float64(*numSections)
+	feet, inches := splitToFeetAndInches(sectionSizeFeet)
+	fmt.Printf("Each section size: %d'%d\"\n", feet, inches)
 }
 
 func parseDimension(dimStr string) (float64, error) {
 	var feet, inches float64
 	var err error
 
-	dimStr = strings.ReplaceAll(dimStr, " ", "")
+	dimStr = strings.ToLower(strings.ReplaceAll(dimStr, " ", ""))
 
-	re := regexp.MustCompile(`^(\d+)'(\d+)"?$`)
+	dimStr = strings.ReplaceAll(dimStr, "'", "f")
+	dimStr = strings.ReplaceAll(dimStr, "ft", "f")
+	dimStr = strings.ReplaceAll(dimStr, "\"", "i")
+	dimStr = strings.ReplaceAll(dimStr, "in", "i")
+
+	// Match format like "8f6i" or "8f"
+	re := regexp.MustCompile(`^(\d+)f(?:([\d]+)i)?$`)
 	matches := re.FindStringSubmatch(dimStr)
-	if len(matches) == 3 {
+	if len(matches) > 0 {
+		// Parse feet
 		feet, err = strconv.ParseFloat(matches[1], 64)
 		if err != nil {
 			return 0, err
 		}
-		inches, err = strconv.ParseFloat(matches[2], 64)
-		if err != nil {
-			return 0, err
+
+		if len(matches) > 2 && matches[2] != "" {
+			inches, err = strconv.ParseFloat(matches[2], 64)
+			if err != nil {
+				return 0, err
+			}
 		}
 	} else {
 		return 0, fmt.Errorf("invalid dimension format")
@@ -52,4 +68,10 @@ func parseDimension(dimStr string) (float64, error) {
 
 	totalFeet := feet + inches/12
 	return totalFeet, nil
+}
+
+func splitToFeetAndInches(totalFeet float64) (int, int) {
+	feet := int(math.Floor(totalFeet))
+	inches := int(math.Round((totalFeet - float64(feet)) * 12))
+	return feet, inches
 }
