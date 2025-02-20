@@ -46,8 +46,8 @@ func parseDimension(dimStr string) (float64, error) {
 	dimStr = strings.ReplaceAll(dimStr, "\"", "i")
 	dimStr = strings.ReplaceAll(dimStr, "in", "i")
 
-	// Match format like "8f6i" or "8f"
-	re := regexp.MustCompile(`^(\d+)f(?:([\d]+)i)?$`)
+	// Match format like "8f6i" or "8f6" or "8f"
+	re := regexp.MustCompile(`^(\d+)f(\d*)i?$`)
 	matches := re.FindStringSubmatch(dimStr)
 	if len(matches) > 0 {
 		// Parse feet
