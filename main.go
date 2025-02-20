@@ -4,15 +4,26 @@ import (
 	"flag"
 	"fmt"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
+const version = "1.1.0"
+
 func main() {
 	dimensionStr := flag.String("d", "", "Dimension in feet and inches, e.g., 8ft6in or 8f6i or 8'6\"")
 	numSections := flag.Int("s", 1, "Number of sections to divide the dimension into (default is 1 section)")
+	showVersion := flag.Bool("v", false, "Show program version")
+	flag.BoolVar(showVersion, "version", false, "Show program version")
+
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("IMP version: %v\n", version)
+		os.Exit(0)
+	}
 
 	if *dimensionStr == "" {
 		fmt.Println("Please provide a dimension using the -d flag, e.g., -d 8ft6in")
