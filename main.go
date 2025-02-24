@@ -15,6 +15,7 @@ const version = "1.1.0"
 func main() {
 	dimensionStr := flag.String("d", "", "Dimension in feet and inches, e.g., 8ft6in or 8f6i or 8'6\"")
 	numSections := flag.Int("s", 1, "Number of sections to divide the dimension into (default is 1 section)")
+	totalInchesFlag := flag.Bool("in", false, "Output the total inches from the input dimension")
 	showVersion := flag.Bool("v", false, "Show program version")
 	flag.BoolVar(showVersion, "version", false, "Show program version")
 
@@ -38,6 +39,12 @@ func main() {
 	totalFeet, err := parseDimension(*dimensionStr)
 	if err != nil {
 		fmt.Println("Error parsing dimension:", err)
+		return
+	}
+
+	if *totalInchesFlag {
+		totalInches := int(math.Round(totalFeet * 12))
+		fmt.Printf("Total inches: %d\n", totalInches)
 		return
 	}
 
