@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const version = "1.2.0"
+const version = "1.3.0" // Fixes the 12" bug
 
 func main() {
 	dimensionStr := flag.String("d", "", "Dimension in feet and inches, e.g., 8ft6in or 8f6i or 8'6\"")
@@ -27,7 +27,7 @@ func main() {
 	}
 
 	if *dimensionStr == "" {
-		fmt.Println("Please provide a dimension using the -d flag, e.g., -d 8ft6in")
+		fmt.Println("Please provide a dimension using the -d flag, e.g., -d 8f6")
 		return
 	}
 
@@ -90,6 +90,10 @@ func parseDimension(dimStr string) (float64, error) {
 
 func splitToFeetAndInches(totalFeet float64) (int, int) {
 	feet := int(math.Floor(totalFeet))
-	inches := int(math.Round((totalFeet - float64(feet)) * 12))
+	inches := int(math.Ceil((totalFeet - float64(feet)) * 12))
+	if inches == 12 {
+		feet++
+		inches = 0
+	}
 	return feet, inches
 }
