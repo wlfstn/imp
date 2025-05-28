@@ -1,4 +1,4 @@
-$exeDownload = "https://github.com/wlfstn/imp/releases/download/V1.2/imp.exe"
+$exeDownload = "https://github.com/wlfstn/imp/releases/download/v1.3.0/imp.exe"
 $destinationDir = "$env:USERPROFILE\wlfstn\imp"
 $destinationFile = Join-Path $destinationDir "imp.exe"
 
